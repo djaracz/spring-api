@@ -1,9 +1,10 @@
 package com.example.api.topic.service;
 
 import com.example.api.topic.model.Topic;
+import com.example.api.topic.repository.TopicsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,53 +14,35 @@ import java.util.stream.Collectors;
 @Service
 public class TopicsService {
 
-    private List<Topic> topics = new ArrayList<>(
-        Arrays.asList(
-            new Topic("1", "name", "desc"),
-            new Topic("2", "name2", "desc2"),
-            new Topic("3", "name3", "desc3")
-        )
-    );
+    @Autowired
+    private TopicsRepository topicsRepository;
 
 
     public List<Topic> getTopics() {
+        List<Topic> topics = new ArrayList<>();
+
+        topicsRepository
+            .findAll()
+            .forEach(topics::add);
+
         return topics;
     }
 
     public Topic getTopic(String id) {
-        return topics
-                .stream()
-                .filter(topic -> topic
-                        .getId()
-                        .equals(id)
-                )
-                .findFirst()
+        return topicsRepository
+                .findById(id)
                 .get();
     }
 
     public void addTopic(Topic topic) {
-        topics.add(topic);
+        topicsRepository.save(topic);
     }
 
-    public void updateTopic(Topic topic) {
-        List<Topic> newTopics = topics
-                .stream()
-                .filter(
-                    eachTopic -> !eachTopic
-                        .getId()
-                        .equals(topic.getId())
-                )
-                .collect(Collectors.toList());
-
-        newTopics.add(topic);
-
-        topics = newTopics;
+    public void updateTopic(String id, Topic topic) {
+        topicsRepository.save(topic);
     }
 
     public void removeTopic(String id) {
-        topics = topics
-            .stream()
-            .filter(topic -> !topic.getId().equals(id))
-            .collect(Collectors.toList());
+        topicsRepository.deleteById(id);
     }
 }
