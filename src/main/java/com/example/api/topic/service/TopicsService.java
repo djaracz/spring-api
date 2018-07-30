@@ -7,6 +7,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Spring treats it as a singleton, and creates instance of it at booting application
 @Service
@@ -38,5 +39,27 @@ public class TopicsService {
 
     public void addTopic(Topic topic) {
         topics.add(topic);
+    }
+
+    public void updateTopic(Topic topic) {
+        List<Topic> newTopics = topics
+                .stream()
+                .filter(
+                    eachTopic -> !eachTopic
+                        .getId()
+                        .equals(topic.getId())
+                )
+                .collect(Collectors.toList());
+
+        newTopics.add(topic);
+
+        topics = newTopics;
+    }
+
+    public void removeTopic(String id) {
+        topics = topics
+            .stream()
+            .filter(topic -> !topic.getId().equals(id))
+            .collect(Collectors.toList());
     }
 }
